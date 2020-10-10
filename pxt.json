@@ -1,0 +1,22 @@
+{
+    "name": "Airbit-Drone-gr-7",
+    "description": "",
+    "dependencies": {
+        "core": "*",
+        "radio": "*",
+        "pxt-bmp280": "github:hokarimasahiro/pxt-bmp280#4f05487351eba698d5e91b8485b387d233249450"
+    },
+    "files": [
+        "main.blocks",
+        "main.ts",
+        "README.md",
+        "custom.ts"
+    ],
+    "testFiles": [
+        "test.ts"
+    ],
+    "supportedTargets": [
+        "microbit"
+    ],
+    "preferredEditor": "blocksprj"
+}
