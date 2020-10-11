@@ -129,9 +129,22 @@ radio.onReceivedString(function (receivedString) {
         if (command == "Y") {
             yaw = parameter
         }
-        failSafeCounter = input.runningTime()
     }
+    failSafeCounter = input.runningTime()
 })
+let oldPressure = 0
+let oldAltitude = 0
+let oldThrottle = 0
+let oldYaw = 0
+let oldRoll = 0
+let oldPitch = 0
+let oldZ = 0
+let oldAna = 0
+let oldBat = 0
+let senseRoll = 0
+let sensePitch = 0
+let senseZ = 0
+let senseAna = 0
 let pressure = 0
 let buzzer = 0
 let Altitude = 0
@@ -167,6 +180,8 @@ BMP280.Address(BMP280_I2C_ADDRESS.ADDR_0x76)
 BMP280.initBmp280()
 pins.setPull(DigitalPin.P5, PinPullMode.PullUp)
 autoPilot = input.buttonIsPressed(Button.A)
+let sendLimit = 100
+let sendTime = input.runningTime()
 basic.forever(function () {
     calculateBatteryVoltage()
     led.toggle(4, 0)
@@ -207,5 +222,53 @@ basic.forever(function () {
     0,
     0
     )
-    radio.sendString("DB=" + convertToText(batteryMilliVolt) + "," + ("DA=" + convertToText(pins.analogReadPin(AnalogPin.P0)) + ",") + ("DG=" + convertToText(input.acceleration(Dimension.Z)) + ",") + ("DP=" + convertToText(input.rotation(Rotation.Pitch)) + ",") + ("DR=" + convertToText(input.rotation(Rotation.Roll)) + ",") + ("DY=" + convertToText(yaw) + ",") + ("DT=" + convertToText(throttle) + ",") + ("TGT=" + convertToText(Altitude) + ",") + ("ALT=" + convertToText(grandLevel - pressure)))
+    senseAna = pins.analogReadPin(AnalogPin.P0)
+    senseZ = input.acceleration(Dimension.Z)
+    sensePitch = input.rotation(Rotation.Pitch)
+    senseRoll = input.rotation(Rotation.Roll)
+    if (batteryMilliVolt != oldBat) {
+        radio.sendString("DB=" + convertToText(batteryMilliVolt))
+        oldBat = batteryMilliVolt
+        sendTime = input.runningTime()
+    }
+    if (senseAna != oldAna) {
+        radio.sendString("DA=" + convertToText(senseAna))
+        oldAna = senseAna
+        sendTime = input.runningTime()
+    }
+    if (senseZ != oldZ) {
+        radio.sendString("DG=" + convertToText(senseZ))
+        oldZ = senseZ
+        sendTime = input.runningTime()
+    }
+    if (sensePitch != oldPitch) {
+        radio.sendString("DP=" + convertToText(sensePitch))
+        oldPitch = sensePitch
+        sendTime = input.runningTime()
+    }
+    if (senseRoll != oldRoll) {
+        radio.sendString("DR=" + convertToText(senseRoll))
+        oldRoll = senseRoll
+        sendTime = input.runningTime()
+    }
+    if (yaw != oldYaw) {
+        radio.sendString("DY=" + convertToText(yaw))
+        oldYaw = yaw
+        sendTime = input.runningTime()
+    }
+    if (throttle != oldThrottle) {
+        radio.sendString("DT=" + convertToText(throttle))
+        oldThrottle = throttle
+        sendTime = input.runningTime()
+    }
+    if (Altitude != oldAltitude) {
+        radio.sendString("TGT=" + convertToText(Altitude))
+        oldAltitude = Altitude
+        sendTime = input.runningTime()
+    }
+    if (pressure != oldPressure) {
+        radio.sendString("ALT=" + convertToText(grandLevel - pressure))
+        oldPressure = pressure
+        sendTime = input.runningTime()
+    }
 })
